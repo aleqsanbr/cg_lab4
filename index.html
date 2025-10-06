@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab #4</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="controls">
+    <div class="info">
+
+    </div>
+</div>
+
+<div class="workspace">
+    <div class="sidebar">
+        <button id="finishPolygon">Завершить полигон (Enter)</button>
+        <button id="clearAll" class="danger">Очистить сцену</button>
+
+        <div class="mode-section">
+            <p><b>Режим работы:</b></p>
+            <button id="modeCreate" class="mode-btn active">Создание</button>
+            <button id="modeIntersect" class="mode-btn">Пересечение</button>
+        </div>
+
+        <div class="polygon-list">
+            <strong>Полигоны</strong>
+            <p>Текущий полигон: <span id="currentPoints">0</span> вершин</p>
+            <div id="polygons"></div>
+        </div>
+    </div>
+
+    <canvas id="canvas" width="1000" height="800"></canvas>
+
+    <div class="transforms-section">
+        <h2>Преобразования</h2>
+        <div class="transform-controls">
+            <p><b>Смещение dx, dy</b></p>
+            <label>dx: <input type="number" id="dx" value="50"></label>
+            <label>dy: <input type="number" id="dy" value="0"></label>
+            <button id="translateBtn">✔</button>
+        </div>
+
+        <div class="transform-controls">
+            <p><b>Поворот вокруг точки</b></p>
+            <label>угол°: <input type="number" id="rotateAngle" value="45"></label>
+            <label>cx: <input type="number" id="rotateCx" value="0"></label>
+            <label>cy: <input type="number" id="rotateCy" value="0"></label>
+            <button id="rotatePointBtn">✔</button>
+        </div>
+
+        <div class="transform-controls">
+            <p><b>Поворот вокруг центра</b></p>
+            <label>угол°: <input type="number" id="rotateCenterAngle" value="45"></label>
+            <button id="rotateCenterBtn">✔</button>
+        </div>
+
+        <div class="transform-controls">
+            <p><b>Масштаб относительно точки</b></p>
+            <label>sx: <input type="number" id="scaleSx" value="1.5" step="0.1"></label>
+            <label>sy: <input type="number" id="scaleSy" value="1.5" step="0.1"></label>
+            <label>cx: <input type="number" id="scaleCx" value="0"></label>
+            <label>cy: <input type="number" id="scaleCy" value="0"></label>
+            <button id="scalePointBtn">✔</button>
+        </div>
+
+        <div class="transform-controls">
+            <p><b>Масштаб относительно центра</b></p>
+            <label>sx: <input type="number" id="scaleCenterSx" value="1.5" step="0.1"></label>
+            <label>sy: <input type="number" id="scaleCenterSy" value="1.5" step="0.1"></label>
+            <button id="scaleCenterBtn">✔</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/geometry.js"></script>
+<script src="js/drawing.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
