@@ -5,7 +5,7 @@ const clearBtn = document.getElementById('clearAll');
 const currentPointsSpan = document.getElementById('currentPoints');
 const polygonsDiv = document.getElementById('polygons');
 
-const MODES = {CREATE: 'create', INTERSECT: 'intersect'};
+const MODES = { CREATE: 'create', INTERSECT: 'intersect', POINT_IN_POLYGON: 'pointInPolygon', POINT_TO_EDGE: 'pointToEdge' };
 let currentMode = MODES.CREATE;
 
 let polygons = [];
@@ -14,6 +14,8 @@ let selectedPolygonIndex = -1;
 
 let intersectEdge = [];
 let intersectionPoints = [];
+let testPoint = null;
+let classificationResult = null;
 
 const currentPolygonColor = '#FF5722';
 const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#ef4444', '#f97316', '#84cc16', '#3b82f6'];
@@ -32,6 +34,8 @@ function init() {
 
     document.getElementById('modeCreate').addEventListener('click', () => switchMode(MODES.CREATE));
     document.getElementById('modeIntersect').addEventListener('click', () => switchMode(MODES.INTERSECT));
+    document.getElementById('modePointInPolygon').addEventListener('click', () => switchMode(MODES.POINT_IN_POLYGON));
+    document.getElementById('modePointToEdge').addEventListener('click', () => switchMode(MODES.POINT_TO_EDGE));
 
     document.getElementById('translateBtn').addEventListener('click', handleTranslate);
     document.getElementById('rotatePointBtn').addEventListener('click', handleRotateAroundPoint);
@@ -46,26 +50,47 @@ function switchMode(mode) {
     currentMode = mode;
     document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
 
+    const resultPanel = document.getElementById('resultPanel');
+    const resultText = document.getElementById('resultText');
+
     if (mode === MODES.CREATE) {
         document.getElementById('modeCreate').classList.add('active');
-        canvas.style.cursor = 'crosshair';
+        resultPanel.style.display = 'none';
     } else if (mode === MODES.INTERSECT) {
-        if (polygons.length === 0) {
-            switchMode(MODES.CREATE);
-            return;
-        }
-
         document.getElementById('modeIntersect').classList.add('active');
-        canvas.style.cursor = 'pointer';
+        resultPanel.style.display = 'block';
+        resultText.innerHTML = 'Выберите полигон и создайте линию пересечения';
+    } else if (mode === MODES.POINT_IN_POLYGON) {
+        document.getElementById('modePointInPolygon').classList.add('active');
+        resultPanel.style.display = 'block';
+        resultText.innerHTML = 'Выберите полигон и кликните точку';
+    } else if (mode === MODES.POINT_TO_EDGE) {
+        document.getElementById('modePointToEdge').classList.add('active');
+        resultPanel.style.display = 'block';
+        resultText.innerHTML = 'Выберите полигон и кликните точку';
     }
 
     currentPolygon = [];
     currentPointsSpan.textContent = '0';
     intersectEdge = [];
     intersectionPoints = [];
-    selectedPolygonIndex = -1;
+    testPoint = null;
+    classificationResult = null;
     updatePolygonList();
     redraw();
+}
+
+function updateResultText(text) {
+    const panel = document.getElementById('resultPanel');
+    const resultText = document.getElementById('resultText');
+
+    if (text) {
+        panel.style.display = 'block';
+        resultText.innerHTML = text;
+    } else {
+        panel.style.display = 'none';
+        resultText.innerHTML = '';
+    }
 }
 
 function onCanvasClick(e) {
@@ -76,6 +101,10 @@ function onCanvasClick(e) {
         handleCreateClick(point);
     } else if (currentMode === MODES.INTERSECT) {
         handleIntersectClick(point);
+    } else if (currentMode === MODES.POINT_IN_POLYGON) {
+        handlePointInPolygonClick(point);
+    } else if (currentMode === MODES.POINT_TO_EDGE) {
+        handlePointToEdgeClick(point);
     }
 }
 
@@ -86,7 +115,10 @@ function handleCreateClick(point) {
 }
 
 function handleIntersectClick(point) {
-    if (selectedPolygonIndex === -1) switchMode(MODES.CREATE);
+    if (selectedPolygonIndex === -1) {
+        alert('Выберите полигон!');
+        return;
+    }
 
     if (intersectEdge.length === 2) {
         intersectEdge = [];
@@ -99,6 +131,30 @@ function handleIntersectClick(point) {
         calculateIntersection();
     }
 
+    redraw();
+}
+
+function handlePointInPolygonClick(point) {
+    if (selectedPolygonIndex === -1) {
+        alert('Выберите полигон!');
+        return;
+    }
+
+    testPoint = point;
+    // TODO: Проверка принадлежит ли заданная пользователем (с помощью мыши) точка выпуклому и невыпуклому полигонам
+    // checkPointInPolygon();
+    redraw();
+}
+
+function handlePointToEdgeClick(point) {
+    if (selectedPolygonIndex === -1) {
+        alert('Выберите полигон!');
+        return;
+    }
+
+    testPoint = point;
+    // TODO: Классифицировать положение точки относительно ребра (справа или слева)
+    // classifyPointToEdges();
     redraw();
 }
 
@@ -141,6 +197,9 @@ function clearScene() {
     currentPointsSpan.textContent = '0';
     intersectEdge = [];
     intersectionPoints = [];
+    testPoint = null;
+    classificationResult = null;
+    updateResultText(null);
     updatePolygonList();
     redraw();
     switchMode(MODES.CREATE)

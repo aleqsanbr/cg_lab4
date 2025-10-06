@@ -32,7 +32,7 @@ function drawPolygon(ctx, points, color, isSelected, isCurrent = false) {
     });
 }
 
-function drawCreateMode(ctx, currentPolygon, currentPolygonColor) {
+function drawCreateMode() {
     if (currentPolygon.length > 0) {
         drawPolygon(ctx, currentPolygon, currentPolygonColor, false, true);
     }
@@ -70,6 +70,27 @@ function drawIntersectMode() {
     }
 }
 
+function drawPointInPolygonMode() {
+    if (testPoint) {
+        // TODO: выводить инфу в div#resultText updateResultText(text)
+        ctx.fillStyle = '#8b5cf6';
+        ctx.beginPath();
+        ctx.arc(testPoint.x, testPoint.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function drawPointToEdgeMode() {
+    if (testPoint) {
+        ctx.fillStyle = '#f59e0b';
+        ctx.beginPath();
+        ctx.arc(testPoint.x, testPoint.y, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        // TODO: выводить инфу в div#resultText updateResultText(text)
+    }
+}
+
 function redraw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -78,8 +99,12 @@ function redraw() {
     });
 
     if (currentMode === MODES.CREATE) {
-        drawCreateMode(ctx, currentPolygon, currentPolygonColor);
+        drawCreateMode();
     } else if (currentMode === MODES.INTERSECT) {
-        drawIntersectMode(ctx, intersectEdge, intersectionPoint);
+        drawIntersectMode();
+    } else if (currentMode === MODES.POINT_IN_POLYGON) {
+        drawPointInPolygonMode();
+    } else if (currentMode === MODES.POINT_TO_EDGE) {
+        drawPointToEdgeMode();
     }
 }

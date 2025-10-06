@@ -7,11 +7,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="controls">
-    <div class="info">
-
-    </div>
-</div>
 
 <div class="workspace">
     <div class="sidebar">
@@ -22,6 +17,13 @@
             <p><b>Режим работы:</b></p>
             <button id="modeCreate" class="mode-btn active">Создание</button>
             <button id="modeIntersect" class="mode-btn">Пересечение</button>
+            <button id="modePointInPolygon" class="mode-btn">Точка в полигоне</button>
+            <button id="modePointToEdge" class="mode-btn">Точка-ребро</button>
+        </div>
+
+        <div id="resultPanel" class="result-panel">
+            <strong>Информация</strong>
+            <div id="resultText"></div>
         </div>
 
         <div class="polygon-list">
