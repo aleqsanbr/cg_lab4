@@ -92,7 +92,7 @@ function findLineIntersection(p1, p2, p3, p4) {
 
 function pointInPolygonWinding(polygonPoints, testPoint) {
     if (polygonPoints.length < 3) {
-        return { inside: false, type: "NOT_POLYGON", message: "Недостаточно точек для полигона" };
+        return { inside: false, type: "NOT_POLYGON", message: "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ" };
     }
 
     let windingNumber = 0;
@@ -102,7 +102,7 @@ function pointInPolygonWinding(polygonPoints, testPoint) {
         const p1 = polygonPoints[i];
         const p2 = polygonPoints[(i + 1) % n];
 
-        // Вычисляем вклад текущего ребра в winding number
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅ winding number
         if (p1.y <= testPoint.y) {
             if (p2.y > testPoint.y && crossProduct(p1, p2, testPoint) > 0) {
                 windingNumber++;
@@ -127,7 +127,6 @@ function pointInPolygonWinding(polygonPoints, testPoint) {
 function classifyPointToEdge(point, edgeStart, edgeEnd) {
     const cross = crossProduct(edgeStart, edgeEnd, point);
 
-    // Определяем положение относительно ребра
     let position;
     if (Math.abs(cross) < 1e-10) {
         position = "ON_LINE";
@@ -192,20 +191,17 @@ function pointToEdgeDistance(point, edgeStart, edgeEnd) {
     const lenSq = C * C + D * D;
 
     if (lenSq === 0) {
-        // Ребро - точка
+        // пїЅпїЅпїЅпїЅпїЅ - пїЅпїЅпїЅпїЅпїЅ
         return Math.sqrt(A * A + B * B);
     }
 
     let param = dot / lenSq;
 
     if (param < 0) {
-        // Ближайшая точка - edgeStart
         return Math.sqrt(A * A + B * B);
     } else if (param > 1) {
-        // Ближайшая точка - edgeEnd
         return Math.sqrt((point.x - edgeEnd.x) ** 2 + (point.y - edgeEnd.y) ** 2);
     } else {
-        // Ближайшая точка на отрезке
         const projX = edgeStart.x + param * C;
         const projY = edgeStart.y + param * D;
         return Math.sqrt((point.x - projX) ** 2 + (point.y - projY) ** 2);

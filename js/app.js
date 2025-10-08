@@ -314,10 +314,6 @@ function checkPointInPolygon() {
         Координаты точки: (${testPoint.x.toFixed(1)}, ${testPoint.y.toFixed(1)})<br>
         Результат: ${result.message}<br>
         Winding Number: ${result.windingNumber || 0}<br>
-        <br>
-        <strong>Метод углов (Winding Number):</strong><br>
-        - Winding Number ≠ 0: точка внутри<br>
-        - Winding Number = 0: точка снаружи<br>
     `;
 
     updateResultText(resultText);
