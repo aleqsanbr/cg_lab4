@@ -73,7 +73,20 @@ function drawIntersectMode() {
 function drawPointInPolygonMode() {
     if (testPoint) {
         // TODO: выводить инфу в div#resultText updateResultText(text)
-        ctx.fillStyle = '#8b5cf6';
+        let pointColor = '#8b5cf6'; // фиолетовый по умолчанию
+
+        if (classificationResult) {
+            switch (classificationResult.type) {
+                case 'INSIDE':
+                    pointColor = '#10b981'; // зеленый
+                    break;
+                case 'OUTSIDE':
+                    pointColor = '#ef4444'; // красный
+                    break;
+            }
+        }
+
+        ctx.fillStyle = pointColor;
         ctx.beginPath();
         ctx.arc(testPoint.x, testPoint.y, 6, 0, Math.PI * 2);
         ctx.fill();
@@ -82,12 +95,48 @@ function drawPointInPolygonMode() {
 
 function drawPointToEdgeMode() {
     if (testPoint) {
+        const polygon = polygons[selectedPolygonIndex];
+
         ctx.fillStyle = '#f59e0b';
         ctx.beginPath();
         ctx.arc(testPoint.x, testPoint.y, 6, 0, Math.PI * 2);
         ctx.fill();
 
-        // TODO: выводить инфу в div#resultText updateResultText(text)
+        if (selectedEdgeIndex !== -1 && polygon) {
+            const edgeStart = polygon.points[selectedEdgeIndex];
+            const edgeEnd = polygon.points[(selectedEdgeIndex + 1) % polygon.points.length];
+
+            // Рисуем выделенное ребро
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(edgeStart.x, edgeStart.y);
+            ctx.lineTo(edgeEnd.x, edgeEnd.y);
+            ctx.stroke();
+
+            // Рисуем проекцию точки на ребро
+            const A = testPoint.x - edgeStart.x;
+            const B = testPoint.y - edgeStart.y;
+            const C = edgeEnd.x - edgeStart.x;
+            const D = edgeEnd.y - edgeStart.y;
+
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            const param = Math.max(0, Math.min(1, dot / lenSq));
+
+            const projX = edgeStart.x + param * C;
+            const projY = edgeStart.y + param * D;
+
+            // Линия от точки до проекции
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 3]);
+            ctx.beginPath();
+            ctx.moveTo(testPoint.x, testPoint.y);
+            ctx.lineTo(projX, projY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
     }
 }
 

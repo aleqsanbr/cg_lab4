@@ -21,6 +21,9 @@ const currentPolygonColor = '#FF5722';
 const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6', '#06b6d4', '#ef4444', '#f97316', '#84cc16', '#3b82f6'];
 let colorIndex = 0;
 
+let selectedEdgeIndex = -1;
+let pointToEdgeResult = null;
+
 function init() {
     clearScene()
 
@@ -75,7 +78,9 @@ function switchMode(mode) {
     intersectEdge = [];
     intersectionPoints = [];
     testPoint = null;
-    classificationResult = null;
+    classificationResult = null; 
+    selectedEdgeIndex = -1;     
+    pointToEdgeResult = null;
     updatePolygonList();
     redraw();
 }
@@ -141,8 +146,7 @@ function handlePointInPolygonClick(point) {
     }
 
     testPoint = point;
-    // TODO: Проверка принадлежит ли заданная пользователем (с помощью мыши) точка выпуклому и невыпуклому полигонам
-    // checkPointInPolygon();
+    checkPointInPolygon();
     redraw();
 }
 
@@ -152,9 +156,22 @@ function handlePointToEdgeClick(point) {
         return;
     }
 
-    testPoint = point;
-    // TODO: Классифицировать положение точки относительно ребра (справа или слева)
-    // classifyPointToEdges();
+    const polygon = polygons[selectedPolygonIndex];
+
+    if (testPoint === null) {
+        // Первый клик - устанавливаем точку
+        testPoint = point;
+        selectedEdgeIndex = -1;
+        pointToEdgeResult = null;
+        updateResultText('Точка установлена. Теперь выберите ребро, кликнув на него.');
+    } else {
+        // Второй клик - выбираем ребро
+        const closestEdge = findClosestEdge(polygon.points, point);
+        selectedEdgeIndex = closestEdge.edgeIndex;
+
+        // Выполняем классификацию
+        classifyPointToEdgePosition();
+    }
     redraw();
 }
 
@@ -199,6 +216,8 @@ function clearScene() {
     intersectionPoints = [];
     testPoint = null;
     classificationResult = null;
+    selectedEdgeIndex = -1;
+    pointToEdgeResult = null;
     updateResultText(null);
     updatePolygonList();
     redraw();
@@ -282,6 +301,49 @@ function transformPolygon(polygonIndex, matrix) {
     const polygon = polygons[polygonIndex];
     polygon.points = polygon.points.map(p => applyMatrix(p, matrix));
     redraw();
+}
+
+function checkPointInPolygon() {
+    if (selectedPolygonIndex === -1 || !testPoint) return;
+
+    const polygon = polygons[selectedPolygonIndex];
+    const result = pointInPolygonWinding(polygon.points, testPoint);
+
+    let resultText = `
+        <strong>Результат проверки точки в полигоне:</strong><br>
+        Координаты точки: (${testPoint.x.toFixed(1)}, ${testPoint.y.toFixed(1)})<br>
+        Результат: ${result.message}<br>
+        Winding Number: ${result.windingNumber || 0}<br>
+        <br>
+        <strong>Метод углов (Winding Number):</strong><br>
+        - Winding Number ≠ 0: точка внутри<br>
+        - Winding Number = 0: точка снаружи<br>
+    `;
+
+    updateResultText(resultText);
+    classificationResult = result;
+}
+
+function classifyPointToEdgePosition() {
+    if (selectedPolygonIndex === -1 || !testPoint || selectedEdgeIndex === -1) return;
+
+    const polygon = polygons[selectedPolygonIndex];
+    const edgeStart = polygon.points[selectedEdgeIndex];
+    const edgeEnd = polygon.points[(selectedEdgeIndex + 1) % polygon.points.length];
+
+    pointToEdgeResult = classifyPointToEdge(testPoint, edgeStart, edgeEnd);
+
+    let resultText = `
+        <strong>Классификация точки относительно ребра:</strong><br>
+        Тестовая точка: (${testPoint.x.toFixed(1)}, ${testPoint.y.toFixed(1)})<br>
+        Ребро ${selectedEdgeIndex + 1}: (${edgeStart.x.toFixed(1)}, ${edgeStart.y.toFixed(1)}) → (${edgeEnd.x.toFixed(1)}, ${edgeEnd.y.toFixed(1)})<br>
+        <br>
+        <strong>Результат:</strong><br>
+        ${pointToEdgeResult.message}<br>
+        Cross Product: ${pointToEdgeResult.crossProduct.toFixed(2)}<br>
+    `;
+
+    updateResultText(resultText);
 }
 
 init();
